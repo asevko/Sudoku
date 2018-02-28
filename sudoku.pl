@@ -36,24 +36,49 @@ unique([HEAD|TAIL]):-
 	unique(TAIL).
 
 
-% print_sudoku(SUDOKU, ROW)
+% print(SUDOKU, STATE)
+% defines what is format of output printing: problem or solution
+print(SUDOKU, STATE) :-
+	(
+		not(state(STATE)) -> 
+		writeln('Unknow state of printing!  Failing now.'),
+		fail
+	;	
+		equal_states(STATE, solution)  ->
+		print_sudoku(SUDOKU, '| ~d ~d ~d | ~d ~d ~d | ~d ~d ~d |~n')
+	;
+		print_sudoku(SUDOKU, '| ~a ~a ~a | ~a ~a ~a | ~a ~a ~a |~n')
+	).
+state(problem).
+state(solution).
+
+equal_states(STATE, STATE).
+
+% print_sudoku(SUDOKU, ROW, FORMAT)
 % nicely prints 9x9 sudoku
 % SUDOKU is a flatten list, ROW is an Int
 print_sudoku([]).
-print_sudoku(SUDOKU) :- print_sudoku(SUDOKU, 0).
-print_sudoku(SUDOKU, 0) :- 
+print_sudoku(SUDOKU, FORMAT) :- 
+	print_sudoku(SUDOKU, 0, FORMAT).
+print_sudoku(SUDOKU, 0, FORMAT) :- 
     writeln('┌───────┬───────┬───────┐'), 
-    print_sudoku(SUDOKU, 1).
-print_sudoku(SUDOKU, 4) :- 
+    print_sudoku(SUDOKU, 1, FORMAT).
+print_sudoku(SUDOKU, 4, FORMAT) :- 
     writeln('│───────┼───────┼───────│'), 
-    print_sudoku(SUDOKU, 5).
-print_sudoku(SUDOKU, 8) :- 
+    print_sudoku(SUDOKU, 5, FORMAT).
+print_sudoku(SUDOKU, 8, FORMAT) :- 
     writeln('│───────┼───────┼───────│'), 
-    print_sudoku(SUDOKU, 9).
-print_sudoku([], 12) :- 
+    print_sudoku(SUDOKU, 9, FORMAT).
+print_sudoku([], 12, _) :- 
     writeln('└───────┴───────┴───────┘').
-print_sudoku([H1, H2, H3, H4, H5, H6, H7, H8, H9|TAIL], ROW) :-
+print_sudoku([H1, H2, H3, H4, H5, H6, H7, H8, H9|TAIL], ROW, FORMAT) :-
  	member(ROW, [1,2,3,5,6,7,9,10,11]),	
-	format('| ~d ~d ~d | ~d ~d ~d | ~d ~d ~d |~n', [H1, H2, H3, H4, H5, H6, H7, H8, H9]),
+	format(FORMAT, [H1, H2, H3, H4, H5, H6, H7, H8, H9]),
 	succ(ROW, DELIMETER_ROW), % DELIMETER_ROW \= ROW + 1
-	print_sudoku(TAIL, DELIMETER_ROW).
+	print_sudoku(TAIL, DELIMETER_ROW, FORMAT).
+
+
+
+
+
+
